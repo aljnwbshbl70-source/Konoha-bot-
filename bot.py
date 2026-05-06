@@ -59,7 +59,7 @@ def start(message):
 
 @bot.message_handler(func=lambda message: True)
 def handle_download(message):
-    url = message.text
+    url = message.text.strip() # تنظيف الفراغات
     if "http" in url:
         status_msg = bot.reply_to(message, "⏳ جاري المعالجة عبر محرك كونوها السريع...")
         
@@ -71,16 +71,12 @@ def handle_download(message):
             "bot_source": "Konoha"
         })
 
-        # إرسال الرابط للبوت القديم (يامي) ليقوم بالتحميل
-        # ملاحظة: نفترض أن البوت القديم مبرمج للرد عند استلام رسائل
         try:
-            yami_engine.send_message(message.chat.id, f"طلب تحميل: {url}\nبواسطة: كونوها 🍃")
-            bot.edit_message_text("✅ تم إرسال الطلب للمحرك، سيصلك الفيديو هنا فور جاهزيته.", message.chat.id, status_msg.message_id)
-        except:
+            # التعديل هنا: نرسل الرابط فقط بدون أي نص إضافي
+            yami_engine.send_message(message.chat.id, url) 
+            
+            bot.edit_message_text("✅ تم إرسال الرابط للمحرك، سيصلك الفيديو هنا فور جاهزيته.", message.chat.id, status_msg.message_id)
+        except Exception as e:
             bot.edit_message_text("❌ عذراً، المحرك الأساسي غير متاح حالياً.", message.chat.id, status_msg.message_id)
-
-# --- 5. التشغيل ---
-if __name__ == "__main__":
-    keep_alive()
-    print("Konoha System is Online... 🔥")
-    bot.infinity_polling()
+            print(f"Error sending to engine: {e}")
+            
